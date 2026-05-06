@@ -1,0 +1,18 @@
+{
+    "C_Cpp.intelliSenseEngine": "default",
+    "idf.adapterTargetName": "esp32",
+    "idf.customExtraPaths": "d:\\EMBEDDED_PROJECT\\tools\\tools\\xtensa-esp-elf-gdb\\16.3_20250913\\xtensa-esp-elf-gdb\\bin;d:\\EMBEDDED_PROJECT\\tools\\tools\\riscv32-esp-elf-gdb\\16.3_20250913\\riscv32-esp-elf-gdb\\bin;d:\\EMBEDDED_PROJECT\\tools\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin;d:\\EMBEDDED_PROJECT\\tools\\tools\\riscv32-esp-elf\\esp-15.2.0_20251204\\riscv32-esp-elf\\bin;d:\\EMBEDDED_PROJECT\\tools\\tools\\esp32ulp-elf\\2.38_20240113\\esp32ulp-elf\\bin;d:\\EMBEDDED_PROJECT\\tools\\tools\\cmake\\4.0.3\\bin;d:\\EMBEDDED_PROJECT\\tools\\tools\\openocd-esp32\\v0.12.0-esp32-20260304\\openocd-esp32\\bin;d:\\EMBEDDED_PROJECT\\tools\\tools\\ninja\\1.12.1;d:\\EMBEDDED_PROJECT\\tools\\tools\\idf-exe\\1.0.3;d:\\EMBEDDED_PROJECT\\tools\\tools\\ccache\\4.12.1\\ccache-4.12.1-windows-x86_64;d:\\EMBEDDED_PROJECT\\tools\\tools\\dfu-util\\0.11\\dfu-util-0.11-win64;d:\\EMBEDDED_PROJECT\\tools\\tools\\esp-rom-elfs\\20241011",
+    "idf.customExtraVars": {
+        "OPENOCD_SCRIPTS": "d:\\EMBEDDED_PROJECT\\tools\\tools\\openocd-esp32\\v0.12.0-esp32-20260304/openocd-esp32/share/openocd/scripts",
+        "IDF_CCACHE_ENABLE": "1",
+        "ESP_ROM_ELF_DIR": "d:\\EMBEDDED_PROJECT\\tools\\tools\\esp-rom-elfs\\20241011/"
+    },
+    "idf.espIdfPathWin": "d:\\EMBEDDED_PROJECT\\esp-idf",
+    "idf.openOcdConfigs": [
+        "interface/ftdi/esp_ftdi.cfg",
+        "target/esp32.cfg"
+    ],
+    "idf.portWin": "COM5",
+    "idf.pythonBinPathWin": "d:\\EMBEDDED_PROJECT\\tools\\python_env\\idf6.0_py3.11_env\\Scripts\\python.exe",
+    "idf.toolsPathWin": "d:\\EMBEDDED_PROJECT\\tools"
+}
