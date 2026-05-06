@@ -8,5 +8,6 @@
         "target/esp32.cfg"
     ],
     "idf.portWin": "COM5",
-    "idf.pythonBinPathWin": "d:\\esp\\v6.0.1\\python_env\\idf6.0_py3.11_env\\Scripts\\python.exe"
+    "idf.pythonBinPathWin": "d:\\esp\\v6.0.1\\python_env\\idf6.0_py3.11_env\\Scripts\\python.exe",
+    "idf.currentSetup": "D:\\New folder (11)\\.espressif\\v6.0.1\\esp-idf"
 }
