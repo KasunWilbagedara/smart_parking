@@ -2,24 +2,35 @@
     "configurations": [
         {
             "name": "ESP-IDF",
-            "compilerPath": "${config:idf.toolsPath}\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-gcc.exe",
+            "compilerPath": "d:/esp/v6.0.1/tools/xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc.exe",
             "includePath": [
-                "${config:idf.espIdfPath}/components/**",
-                "${config:idf.espIdfPathWin}/components/**",
-                "${config:idf.espAdfPath}/components/**",
-                "${config:idf.espAdfPathWin}/components/**",
+                "d:/esp/v6.0.1/esp-idf/components/freertos/FreeRTOS-Kernel/include",
+                "d:/esp/v6.0.1/esp-idf/components/freertos/include",
+                "d:/esp/v6.0.1/esp-idf/components/esp_driver_gpio/include",
+                "d:/esp/v6.0.1/esp-idf/components/esp_driver_ledc/include",
+                "d:/esp/v6.0.1/esp-idf/components/esp_timer/include",
+                "d:/esp/v6.0.1/esp-idf/components/esp_common/include",
+                "d:/esp/v6.0.1/esp-idf/components/esp_rom/include",
+                "d:/esp/v6.0.1/esp-idf/components/hal/include",
+                "d:/esp/v6.0.1/esp-idf/components/soc/include",
+                "d:/esp/v6.0.1/esp-idf/components/esp_hw_support/include",
+                "d:/esp/v6.0.1/esp-idf/components/esp_system/include",
+                "d:/esp/v6.0.1/esp-idf/components/esp32/include",
                 "${workspaceFolder}/**"
             ],
             "browse": {
                 "path": [
-                    "${config:idf.espIdfPath}/components",
-                    "${config:idf.espIdfPathWin}/components",
-                    "${config:idf.espAdfPath}/components/**",
-                    "${config:idf.espAdfPathWin}/components/**",
+                    "d:/esp/v6.0.1/esp-idf/components",
                     "${workspaceFolder}"
                 ],
                 "limitSymbolsToIncludedHeaders": false
-            }
+            },
+            "cStandard": "gnu17",
+            "intelliSenseMode": "gcc-x64",
+            "defines": [
+                "ESP32",
+                "ESP_PLATFORM"
+            ]
         }
     ],
     "version": 4

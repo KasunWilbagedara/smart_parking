@@ -1,4 +1,4 @@
-#include <stdio.h>
+/*#include <stdio.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "driver/gpio.h"
@@ -137,6 +137,45 @@ void app_main(void) {
 
     // 3. Create FreeRTOS Tasks
     // This allows sensor reading and processing to run at the same time
+    xTaskCreate(sensor_task, "sensor_task", 2048, NULL, 5, NULL);
+    xTaskCreate(logic_output_task, "logic_task", 2048, NULL, 5, NULL);
+}
+    */
+   #include <stdio.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "driver/gpio.h"
+#include "driver/ledc.h"
+#include "parking_system.h"
+
+void app_main(void) {
+    printf("Parking System Modular Startup...\n");
+
+    // Initialize GPIOs
+    gpio_config_t io_conf = {
+        .pin_bit_mask = (1ULL<<TRIG_PIN_1) | (1ULL<<TRIG_PIN_2) | (1ULL<<LED_SLOT_1) | (1ULL<<LED_SLOT_2) | (1ULL<<BUZZER_PIN),
+        .mode = GPIO_MODE_OUTPUT,
+        .pull_down_en = 0, .pull_up_en = 0, .intr_type = GPIO_INTR_DISABLE
+    };
+    gpio_config(&io_conf);
+
+    gpio_set_direction(ECHO_PIN_1, GPIO_MODE_INPUT);
+    gpio_set_direction(ECHO_PIN_2, GPIO_MODE_INPUT);
+
+    // Initialize Servo PWM
+    ledc_timer_config_t ledc_timer = {
+        .speed_mode = LEDC_LOW_SPEED_MODE, .timer_num = LEDC_TIMER_0,
+        .duty_resolution = LEDC_TIMER_13_BIT, .freq_hz = 50, .clk_cfg = LEDC_AUTO_CLK
+    };
+    ledc_timer_config(&ledc_timer);
+
+    ledc_channel_config_t ledc_channel = {
+        .speed_mode = LEDC_LOW_SPEED_MODE, .channel = LEDC_CHANNEL_0,
+        .timer_sel = LEDC_TIMER_0, .gpio_num = SERVO_PIN, .duty = 0
+    };
+    ledc_channel_config(&ledc_channel);
+
+    // Start Tasks
     xTaskCreate(sensor_task, "sensor_task", 2048, NULL, 5, NULL);
     xTaskCreate(logic_output_task, "logic_task", 2048, NULL, 5, NULL);
 }
