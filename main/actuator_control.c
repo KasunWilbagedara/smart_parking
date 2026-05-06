@@ -1,36 +1,50 @@
-#include <stdio.h>
 #include "parking_system.h"
-#include "driver/ledc.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "rom/ets_sys.h"
 
-bool slot1_occupied = false;
-bool slot2_occupied = false;
-int available_slots = TOTAL_SLOTS;
+static void lcd_write_nibble(i2c_master_dev_handle_t dev, uint8_t nibble, uint8_t mode) {
+    uint8_t data = (nibble & 0xF0) | mode | LCD_BACKLIGHT;
+    uint8_t en_high = data | LCD_ENABLE;
+    uint8_t en_low = data & ~LCD_ENABLE;
 
-void logic_output_task(void *pvParameters) {
-    while(1) {
-        slot1_occupied = (distance_1 > 0 && distance_1 < DISTANCE_THRESHOLD_CM);
-        slot2_occupied = (distance_2 > 0 && distance_2 < DISTANCE_THRESHOLD_CM);
-        available_slots = TOTAL_SLOTS - (slot1_occupied + slot2_occupied);
+    i2c_master_transmit(dev, &en_high, 1, 100);
+    ets_delay_us(1);
+    i2c_master_transmit(dev, &en_low, 1, 100);
+    ets_delay_us(50);
+}
 
-        gpio_set_level(LED_SLOT_1, slot1_occupied);
-        gpio_set_level(LED_SLOT_2, slot2_occupied);
+void lcd_send_cmd(i2c_master_dev_handle_t dev, uint8_t cmd) {
+    lcd_write_nibble(dev, cmd & 0xF0, 0);
+    lcd_write_nibble(dev, (cmd << 4) & 0xF0, 0);
+}
 
-        printf("\n--- Status: %d Slots Available ---\n", available_slots);
-        printf("S1: %d cm | S2: %d cm\n", distance_1, distance_2);
+void lcd_send_data(i2c_master_dev_handle_t dev, uint8_t data) {
+    lcd_write_nibble(dev, data & 0xF0, LCD_RS);
+    lcd_write_nibble(dev, (data << 4) & 0xF0, LCD_RS);
+}
 
-        if (available_slots == 0) {
-            gpio_set_level(BUZZER_PIN, 1);
-            ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, 400); // Closed
-            printf("FULL: Gate Closed\n");
-        } else {
-            gpio_set_level(BUZZER_PIN, 0);
-            ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, 800); // Open
-            printf("OPEN: Gate Active\n");
-        }
-        ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
-        
-        vTaskDelay(pdMS_TO_TICKS(1000));
-    }
+void lcd_init(i2c_master_dev_handle_t dev) {
+    vTaskDelay(pdMS_TO_TICKS(50));
+    lcd_write_nibble(dev, 0x30, 0); vTaskDelay(pdMS_TO_TICKS(5));
+    lcd_write_nibble(dev, 0x30, 0); vTaskDelay(pdMS_TO_TICKS(5));
+    lcd_write_nibble(dev, 0x30, 0); vTaskDelay(pdMS_TO_TICKS(5));
+    lcd_write_nibble(dev, 0x20, 0); vTaskDelay(pdMS_TO_TICKS(5));
+    lcd_send_cmd(dev, 0x28); lcd_send_cmd(dev, 0x0C);
+    lcd_send_cmd(dev, 0x06); lcd_send_cmd(dev, 0x01);
+    vTaskDelay(pdMS_TO_TICKS(5));
+}
+
+void lcd_put_cursor(i2c_master_dev_handle_t dev, int row, int col) {
+    uint8_t addr = (row == 0) ? (0x80 + col) : (0xC0 + col);
+    lcd_send_cmd(dev, addr);
+}
+
+void lcd_send_string(i2c_master_dev_handle_t dev, const char *str) {
+    while (*str) lcd_send_data(dev, (uint8_t)*str++);
+}
+
+void lcd_clear(i2c_master_dev_handle_t dev) {
+    lcd_send_cmd(dev, 0x01);
+    vTaskDelay(pdMS_TO_TICKS(2));
 }

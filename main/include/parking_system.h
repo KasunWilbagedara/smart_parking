@@ -2,30 +2,28 @@
 #define PARKING_SYSTEM_H
 
 #include "driver/gpio.h"
+#include "driver/i2c_master.h"
 
 // --- Pin Definitions ---
 #define TRIG_PIN_1     5
 #define ECHO_PIN_1     18
-#define TRIG_PIN_2     19
-#define ECHO_PIN_2     21
 #define LED_SLOT_1     13
-#define LED_SLOT_2     14
-#define BUZZER_PIN     27
-#define SERVO_PIN      26
+#define BUZZER_PIN     47
+#define SERVO_PIN      21
+#define I2C_SDA_IO     8
+#define I2C_SCL_IO     9
 
-// --- Constants ---
-#define DISTANCE_THRESHOLD_CM 10
-#define TOTAL_SLOTS 2
+// --- LCD Constants ---
+#define LCD_ADDR       0x27
+#define LCD_BACKLIGHT  0x08
+#define LCD_ENABLE     0x04
+#define LCD_RS         0x01
 
-// --- Global Variables (declared as extern to share across files) ---
-extern int distance_1;
-extern int distance_2;
-extern bool slot1_occupied;
-extern bool slot2_occupied;
-extern int available_slots;
-
-// --- Function Prototypes ---
-void sensor_task(void *pvParameters);
-void logic_output_task(void *pvParameters);
+// --- Prototypes ---
+void lcd_init(i2c_master_dev_handle_t dev);
+void lcd_send_string(i2c_master_dev_handle_t dev, const char *str);
+void lcd_put_cursor(i2c_master_dev_handle_t dev, int row, int col);
+void lcd_clear(i2c_master_dev_handle_t dev);
+int get_distance(gpio_num_t trig, gpio_num_t echo);
 
 #endif
