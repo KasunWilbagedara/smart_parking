@@ -12,6 +12,8 @@
 #define SERVO_PIN      21
 #define I2C_SDA_IO     8
 #define I2C_SCL_IO     9
+#define TRIG_PIN_2     10
+#define ECHO_PIN_2     11
 
 // --- LCD Constants ---
 #define LCD_ADDR       0x27

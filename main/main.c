@@ -172,29 +172,59 @@ void app_main(void) {
     ledc_channel_config(&led_ch);
 
     // 3. Main Infinite Super-Loop
-    while (1) {
-        int dist = get_distance(TRIG_PIN_1, ECHO_PIN_1);
-        bool full = (dist > 0 && dist < 10);
+while (1) {
+        // 1. Read Sensors
+        // Old Sensor (5, 18) checks if the parking slot is occupied
+        int slot_dist = get_distance(TRIG_PIN_1, ECHO_PIN_1); 
+        vTaskDelay(pdMS_TO_TICKS(50)); 
+        
+        // New Sensor (10, 11) checks if a car is waiting at the gate
+        int gate_req_dist = get_distance(TRIG_PIN_2, ECHO_PIN_2);
 
-        gpio_set_level(LED_SLOT_1, full);
-        lcd_put_cursor(dev_handle, 0, 0);
+        // 2. Define States
+        bool slot_occupied = (slot_dist > 0 && slot_dist < 10);
+        bool car_at_gate   = (gate_req_dist > 0 && gate_req_dist < 10);
 
-        if (full) {
-            lcd_send_string(dev_handle, " PARK IS FULL   ");
-            lcd_put_cursor(dev_handle, 1, 0);
-            lcd_send_string(dev_handle, " Gate: CLOSED   ");
-            gpio_set_level(BUZZER_PIN, 1);
-            ledc_set_duty(LEDC_LOW_SPEED_MODE, 0, 400); 
-        } else {
-            lcd_send_string(dev_handle, " Slots Avail: 1 ");
-            lcd_put_cursor(dev_handle, 1, 0);
-            lcd_send_string(dev_handle, " Gate: OPEN     ");
+        // 3. Apply your Logic Rules
+        // Rule 1: Gate opens ONLY IF (Car at Gate) AND (Slot is NOT occupied)
+        // Rule 2: If Slot is occupied, gate MUST be closed
+        // Rule 3: If no car at gate, gate MUST be closed
+        
+        bool should_open = car_at_gate && !slot_occupied;
+
+        // 4. Execute Hardware Actions
+        if (should_open) {
+            // OPEN GATE
+            ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, 800); // ~90 degrees
             gpio_set_level(BUZZER_PIN, 0);
-            ledc_set_duty(LEDC_LOW_SPEED_MODE, 0, 800); 
+            
+            lcd_put_cursor(dev_handle, 0, 0);
+            lcd_send_string(dev_handle, "Welcome!        ");
+            lcd_put_cursor(dev_handle, 1, 0);
+            lcd_send_string(dev_handle, "Gate: OPENing   ");
+        } 
+        else {
+            // CLOSE GATE
+            ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, 400); // ~0 degrees
+            
+            lcd_put_cursor(dev_handle, 0, 0);
+            if (slot_occupied) {
+                lcd_send_string(dev_handle, "SPOT OCCUPIED   ");
+                gpio_set_level(BUZZER_PIN, 1); // Alarm if someone tries to enter when full
+            } else {
+                lcd_send_string(dev_handle, "READY - NO CAR  ");
+                gpio_set_level(BUZZER_PIN, 0);
+            }
+            
+            lcd_put_cursor(dev_handle, 1, 0);
+            lcd_send_string(dev_handle, "Gate: CLOSED    ");
         }
-        ledc_update_duty(LEDC_LOW_SPEED_MODE, 0);
+        ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
 
-        // Required delay for Watchdog and LCD readability
+        // Debug console output
+        printf("Slot Occ: %s | Car at Gate: %s\n", 
+                slot_occupied ? "YES" : "NO", 
+                car_at_gate ? "YES" : "NO");
+
         vTaskDelay(pdMS_TO_TICKS(500)); 
     }
-}
